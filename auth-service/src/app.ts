@@ -1,4 +1,4 @@
-const http = require('http');
+import http from 'http';
 
 http.createServer((req, res) => {
     message: "Hello from Auth Service!";
@@ -11,7 +11,7 @@ http.createServer((req, res) => {
     res.end(JSON.stringify({
         message: "Hello from Auth Service!",
         url: req.url,
-        headers:req.headers,
+        headers: req.headers,
     }));
 }).listen(3001, () => {
     console.log('Auth service running at http://localhost:3001/');
