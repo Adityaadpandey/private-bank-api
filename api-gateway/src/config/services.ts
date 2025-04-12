@@ -17,19 +17,17 @@ class ServiceProxy {
       path: '/api/v1/accounts/',
       url: config.ACCOUNTS_SERVICE_URL,
       pathRewrite: { '^/': '/api/v1/accounts/' },
-      name: 'accounts-service',
-      timeout: 5000,
+      name: 'account-service',
     },
     {
       path: '/api/v1/transactions/',
-      url: config.TRANSACTIONS_SERVICE_URL,
+      url: config.TRANSACTION_SERVICE_URL,
       pathRewrite: { '^/': '/api/v1/transactions/' },
-      name: 'transactions-service',
-      timeout: 5000,
+      name: 'transaction-service',
     },
   ];
 
-  public static createProxyOptions(service: ServiceConfig): Options {
+  private static createProxyOptions(service: ServiceConfig): Options {
     return {
       target: service.url,
       changeOrigin: true,
@@ -44,36 +42,34 @@ class ServiceProxy {
     };
   }
 
-  private static handleProxyError(err: Error, req: any, res: any) {
-    logger.error(`Proxy error: ${err.message}`);
+  private static handleProxyError(err: Error, req: any, res: any): void {
+    logger.error(`Proxy error for ${req.path}:`, err);
+
     const errorResponse: ProxyErrorResponse = {
       message: 'Service unavailable',
       status: 503,
       timestamp: new Date().toISOString(),
     };
+
     res
       .status(503)
       .setHeader('Content-Type', 'application/json')
       .end(JSON.stringify(errorResponse));
   }
 
-  private static handleProxyRequest(proxyReq: any, req: any, res: any) {
-    logger.debug(`Proxy request: ${req.method} ${req.url}`);
+  private static handleProxyRequest(proxyReq: any, req: any): void {
+    logger.debug(`Proxying request to ${req.path}`);
   }
 
-  private static handleProxyResponse(proxyRes: any, req: any, res: any) {
-    logger.debug(
-      `Proxy response: ${proxyRes.statusCode} ${req.method} ${req.url}`,
-    );
+  private static handleProxyResponse(proxyRes: any, req: any): void {
+    logger.debug(`Received response for ${req.path}`);
   }
 
-  public static setupProxy(app: Application) {
+  public static setupProxy(app: Application): void {
     ServiceProxy.serviceConfigs.forEach((service) => {
       const proxyOptions = ServiceProxy.createProxyOptions(service);
       app.use(service.path, createProxyMiddleware(proxyOptions));
-      logger.info(
-        `Proxying ${service.name} requests from ${service.path} to ${service.url}`,
-      );
+      logger.info(`Configured proxy for ${service.name} at ${service.path}`);
     });
   }
 }

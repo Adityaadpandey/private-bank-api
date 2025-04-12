@@ -6,41 +6,65 @@ class RedisClient {
   private static instance: Redis;
   private static isConnected = false;
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): Redis {
     if (!RedisClient.instance) {
       RedisClient.instance = new Redis(config.REDIS_URL, {
         retryStrategy: (times: number) => {
           const delay = Math.min(times * 50, 2000);
-          logger.warn(`Redis connection failed. Retrying in ${delay}ms...`);
           return delay;
         },
         maxRetriesPerRequest: 3,
       });
+
       RedisClient.setupEventListeners();
     }
     return RedisClient.instance;
   }
-  private static setupEventListeners() {
+
+  private static setupEventListeners(): void {
     RedisClient.instance.on('connect', () => {
-      logger.info('Redis connected');
       RedisClient.isConnected = true;
+      logger.info('Connected to Redis');
     });
 
-    RedisClient.instance.on('error', (err) => {
-      logger.error(`Redis error: ${err}`);
+    RedisClient.instance.on('error', (error) => {
       RedisClient.isConnected = false;
+      logger.error('Redis connection error:', error);
     });
 
     RedisClient.instance.on('close', () => {
-      logger.warn('Redis connection closed');
       RedisClient.isConnected = false;
+      logger.warn('Redis connection closed');
     });
 
     RedisClient.instance.on('reconnecting', () => {
-      logger.warn('Redis reconnecting...');
+      logger.info('Reconnecting to Redis...');
     });
+  }
+
+  public static async closeConnection() {
+    if (RedisClient.instance) {
+      try {
+        await RedisClient.instance.quit();
+        logger.info('Redis connection closed');
+      }
+      catch (error) {
+        logger.error('Error closing Redis connection:', error);
+      }
+    }
+  }
+
+  public static async testConnection(): Promise<boolean> {
+    try {
+      await RedisClient.instance.ping();
+      return true;
+    }
+    catch (error) {
+      logger.error('Redis connection test failed:', error);
+      return false;
+    }
   }
 
   public static isReady(): boolean {
@@ -49,3 +73,4 @@ class RedisClient {
 }
 
 export default RedisClient.getInstance();
+export { RedisClient };
