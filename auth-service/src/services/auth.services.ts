@@ -24,7 +24,6 @@ export default class AuthService {
     constructor() {
         this.credentialRepository = AppDataSource.getRepository(Credential);
         this.userRepository = AppDataSource.getRepository(User);
-        console.log("✅ Auth service file loaded");
     }
 
     async register({ firstName, lastName, email, password }: RegisterUser): Promise<User> {
