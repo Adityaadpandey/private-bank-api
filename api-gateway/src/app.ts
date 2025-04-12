@@ -3,18 +3,19 @@ dotenv.config();
 
 import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
-// import helmet from 'helmet';
+import helmet from 'helmet';
 
 import { config } from './config';
 import logger from './config/logger';
 import { proxyServices } from './config/services';
-import { limiter } from "./middlewares/rate-limit.middleware";
+import { limiter } from './middlewares/rate-limit.middleware';
 
 const app = express();
 
-// app.use(helmet());
+app.use(helmet());
 app.use(cors());
 app.use(limiter);
+
 
 // Request logging
 app.use((req: Request, res: Response, next: NextFunction) => {

@@ -58,11 +58,11 @@ class ServiceProxy {
   }
 
   private static handleProxyRequest(proxyReq: any, req: any): void {
-    logger.debug(`Proxying request to ${req.path}`);
+    // logger.debug(`Proxying request to ${req.path}`);
   }
 
   private static handleProxyResponse(proxyRes: any, req: any): void {
-    logger.debug(`Received response for ${req.path}`);
+    // logger.debug(`Received response for ${req.path}`);
   }
 
   public static setupProxy(app: Application): void {
