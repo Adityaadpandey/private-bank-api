@@ -16,12 +16,12 @@ export const verifyToken = (
     if (publicRoutes.includes(req.path)) {
         return next();
     }
-
-    const token = req.headers["authorization"]?.split("")[1];
+    // console.log(req.headers["authorization"])
+    const token = req.headers["authorization"]
     if (!token) {
         return res.status(401).json({
             status: "error",
-            message: "invalid authorization token",
+            message: "invalid authorization token in head",
         });
     }
 
@@ -29,9 +29,12 @@ export const verifyToken = (
         if (err) {
             return res.status(401).json({
                 status: "error",
-                message: "invalid authorization token",
+                message: "unauthorized",
+                err: err.message,
             });
         }
+        req.userId = decoded.id;
+        req.token = token;
 
         const redisKey = `auth:${decoded.id}:${token}`;
         const redisToken = await redis.get(redisKey);
@@ -39,12 +42,10 @@ export const verifyToken = (
         if (!redisToken) {
             return res.status(401).json({
                 status: "error",
-                message: "invalid authorization token",
+                message: "invalid authorization token in rs",
             });
         }
 
-        req.userId = decoded.id;
-        req.token = token;
         next();
     }
     );
