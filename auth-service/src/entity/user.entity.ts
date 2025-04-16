@@ -1,33 +1,33 @@
 import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    OneToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from "typeorm";
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Credential } from './credential.entity';
 
 @Entity()
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ name: 'first_name' })
-    firstName: string;
+  @Column({ name: 'first_name' })
+  firstName: string;
 
-    @Column({ name: 'last_name' })
-    lastName: string;
+  @Column({ name: 'last_name' })
+  lastName: string;
 
-    @Column({ unique: true })
-    email: string;
+  @Column({ unique: true })
+  email: string;
 
-    @OneToOne(() => Credential, (credential) => credential.user)
-    credential: Credential;
+  @OneToOne(() => Credential, (credential) => credential.user)
+  credential: Credential;
 
-    @CreateDateColumn({ name: 'created_at' })
-    createdAt: Date;
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 
-    @UpdateDateColumn({ name: 'updated_at' })
-    updatedAt: Date;
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 }

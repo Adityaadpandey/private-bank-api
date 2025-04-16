@@ -1,5 +1,5 @@
-import { connectKafka } from "../events/kafka";
+import { connectKafka } from '../events/kafka';
 
 export default async () => {
-   await connectKafka();
-}
+  await connectKafka();
+};

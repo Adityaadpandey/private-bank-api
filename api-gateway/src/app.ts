@@ -16,7 +16,6 @@ app.use(helmet());
 app.use(cors());
 app.use(limiter);
 
-
 // Request logging
 app.use((req: Request, res: Response, next: NextFunction) => {
   logger.debug(`${req.method} ${req.url}`);

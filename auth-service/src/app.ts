@@ -20,31 +20,28 @@ import { setupGracefulShutdown } from './utils/shutdown';
 const app = express();
 
 app.use(helmet());
-app.use(corsMiddleware)
+app.use(corsMiddleware);
 
 app.use(reqLogger);
 app.use(express.json());
-app.use(verifyToken)
-
+app.use(verifyToken);
 
 // routes
 app.use('/', indexRoute);
 app.use('/api/v1/auth/', authRouter);
 
-
 app.use(errorHandler);
 
 AppDataSource.initialize()
-    .then(async () => {
-        await init();
+  .then(async () => {
+    await init();
 
-        const server = app.listen(config.PORT, () => {
-            logger.info(`Auth service listening on port ${config.PORT}`);
-        }
-        );
-        // Graceful shutdown
-        setupGracefulShutdown(server);
-
-    }).catch((error) => {
-        logger.error("Error during Data Source initialization", error);
-    })
+    const server = app.listen(config.PORT, () => {
+      logger.info(`Auth service listening on port ${config.PORT}`);
+    });
+    // Graceful shutdown
+    setupGracefulShutdown(server);
+  })
+  .catch((error) => {
+    logger.error('Error during Data Source initialization', error);
+  });

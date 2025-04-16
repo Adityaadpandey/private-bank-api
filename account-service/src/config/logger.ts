@@ -22,7 +22,7 @@ const logger = winston.createLogger({
       const time = chalk.gray(`[${info.timestamp}]`);
       const msg = chalk.white(info.message);
       const service = chalk.cyan.bold(
-        info.service || config.SERVICE_NAME || 'GENCO',
+        info.service || config.SERVICE_NAME || 'Account Service',
       );
 
       return `${time} ${tag} ${service}: ${msg}`;

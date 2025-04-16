@@ -11,8 +11,8 @@ interface Config {
 }
 
 export const config: Config = {
-  SERVICE_NAME: require('../../package.json').name || 'auth-service',
-  PORT: parseInt(process.env.PORT || '5001', 10),
+  SERVICE_NAME: require('../../package.json').name || 'account-service',
+  PORT: parseInt(process.env.PORT || '5002', 10),
   DATABASE_URL:
     process.env.DATABASE_URL ||
     'postgresql://myuser:mypassword@localhost:5432/privatebank',
