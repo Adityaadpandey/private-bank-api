@@ -1,6 +1,6 @@
 import { Server } from 'http';
 import logger from '../config/logger';
-import { RedisClient } from '../config/redis';
+import { redisClient } from '../config/redis';
 import { AppDataSource } from '../data-source';
 
 export const setupGracefulShutdown = (server: Server) => {
@@ -19,7 +19,7 @@ export const setupGracefulShutdown = (server: Server) => {
         logger.info('Database connection closed.');
       }
 
-      await RedisClient.closeConnection();
+      await redisClient.closeConnection();
       logger.info('Redis connection closed.');
 
       logger.info('All connections closed. Exiting process.');

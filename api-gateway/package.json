@@ -21,7 +21,9 @@
     "http-proxy-middleware": "^3.0.3",
     "ioredis": "^5.6.0",
     "jsonwebtoken": "^9.0.2",
-    "winston": "^3.17.0"
+    "winston": "^3.17.0",
+    "@private-bank/logger": "../packages/logger",
+    "@private-bank/redis-client": "../packages/redis-client"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
