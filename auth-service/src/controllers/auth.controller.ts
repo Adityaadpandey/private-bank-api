@@ -14,37 +14,38 @@ const loginSchema = z.object({
   password: z.string(),
 });
 
-class AuthController {
+export class AuthController {
   private authService: AuthService;
 
   constructor() {
     this.authService = new AuthService();
   }
 
-  register = async (req: Request, res: Response): Promise<any> => {
+  async register(req: Request, res: Response): Promise<any> {
     const { firstName, lastName, email, password } = registerSchema.parse(
       req.body,
     );
+
     const user = await this.authService.register({
       firstName,
       lastName,
       email,
       password,
     });
-    return res.status(201).json({ user });
-  };
 
-  login = async (req: Request, res: Response): Promise<any> => {
+    return res.status(201).json(user);
+  }
+
+  async login(req: Request, res: Response): Promise<any> {
     const { email, password } = loginSchema.parse(req.body);
-    const token = await this.authService.login(email, password);
+    const { token } = await this.authService.login(email, password);
 
     return res.status(200).json({ token });
-  };
+  }
 
-  logout = async (req: Request, res: Response): Promise<any> => {
+  async logout(req: Request, res: Response): Promise<any> {
     await this.authService.logout(req.userId!, req.token);
-    return res.status(200).json({ message: 'Logged out successfully' });
-  };
-}
 
-export { AuthController };
+    return res.status(200).json({ message: 'logged out successfully' });
+  }
+}

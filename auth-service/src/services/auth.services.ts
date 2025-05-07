@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import ms from 'ms';
+
 import { Repository } from 'typeorm';
 import { config } from '../config';
 import redis from '../config/redis';
@@ -10,14 +11,14 @@ import { User } from '../entity/user.entity';
 import { publishUserRegisteredEvent } from '../events/producers/userRegistered.producer';
 import { createError } from '../utils';
 
-interface RegisterUser {
+interface RegisterDto {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
 }
 
-export default class AuthService {
+class AuthService {
   credentialRepository: Repository<Credential>;
   userRepository: Repository<User>;
 
@@ -26,16 +27,13 @@ export default class AuthService {
     this.userRepository = AppDataSource.getRepository(User);
   }
 
-  async register({
-    firstName,
-    lastName,
-    email,
-    password,
-  }: RegisterUser): Promise<User> {
+  async register({ firstName, lastName, email, password }: RegisterDto) {
     const existing = await this.credentialRepository.findOneBy({ email });
+
     if (existing) {
-      throw createError('Email already exists', 400);
+      throw createError('email already in use', 400);
     }
+
     const passwordHash = await bcrypt.hash(password, 10);
 
     const user = new User();
@@ -45,12 +43,12 @@ export default class AuthService {
 
     await this.userRepository.save(user);
 
-    const creadential = new Credential();
-    creadential.email = email;
-    creadential.passwordHash = passwordHash;
-    creadential.user = user;
+    const credential = new Credential();
+    credential.email = email;
+    credential.passwordHash = passwordHash;
+    credential.user = user;
 
-    await this.credentialRepository.save(creadential);
+    await this.credentialRepository.save(credential);
 
     await publishUserRegisteredEvent({
       key: user.id?.toString(),
@@ -63,11 +61,11 @@ export default class AuthService {
   async login(email: string, password: string) {
     const credential = await this.credentialRepository.findOne({
       where: { email },
-      relations: { user: true },
+      relations: ['user'],
     });
 
     if (!credential) {
-      throw createError('Invalid email or password', 401);
+      throw createError('invalid credentials', 401);
     }
 
     const isValidPassword = await bcrypt.compare(
@@ -76,7 +74,7 @@ export default class AuthService {
     );
 
     if (!isValidPassword) {
-      throw createError('Invalid email or password', 401);
+      throw createError('invalid credentials', 401);
     }
 
     const token = jwt.sign(
@@ -104,7 +102,9 @@ export default class AuthService {
     };
   }
 
-  async logout(userId: string, token: string) {
+  async logout(userId: number, token: string) {
     await redis.del(`auth:${userId}:${token}`);
   }
 }
+
+export default AuthService;

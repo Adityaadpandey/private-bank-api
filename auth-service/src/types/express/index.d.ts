@@ -4,7 +4,7 @@ declare global {
   namespace Express {
     interface Request {
       token: string;
-      userId: string;
+      userId: number;
     }
   }
 }

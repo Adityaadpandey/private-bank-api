@@ -1,13 +1,14 @@
 import { Router } from 'express';
+import { config } from '../config';
 
-const indexRoute = Router();
+const indexRouter = Router();
 
-indexRoute.get('/', (req, res) => {
-  res.send('Auth service is running');
+indexRouter.get('/', async (req, res): Promise<any> => {
+  return res.json({ service: config.SERVICE_NAME, status: 'running' });
 });
 
-indexRoute.get('/health', (req, res) => {
-  res.send('Auth service is healthy');
+indexRouter.get('/health', async (req, res): Promise<any> => {
+  return res.json({ service: config.SERVICE_NAME, status: 'ok' });
 });
 
-export default indexRoute;
+export default indexRouter;

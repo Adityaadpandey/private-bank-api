@@ -9,19 +9,28 @@ import { setupGracefulShutdown } from './utils/shutdown';
 import helmet from 'helmet';
 import { errorHandler } from './middlewares/error.middleware';
 import { reqLogger } from './middlewares/req.middleware';
-import indexRoutes from './routes/indexRoutes';
+import indexRoutes from './routes/index.route';
+
+import { AppDataSource } from './data-source';
+import { verifyToken } from './middlewares/auth.middleware';
+import accountRouter from './routes/accounts.route';
 
 const app = express();
 app.use(helmet());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
 app.use(reqLogger);
+app.use(verifyToken);
 
 app.use('/', indexRoutes);
+app.use('/api/v1/accounts', accountRouter);
 
 app.use(errorHandler);
 
-const startServer = () => {
+
+AppDataSource.initialize()
+  .then(() => {
+    logger.info('Database connection established successfully');
   try {
     const server = app.listen(config.PORT, () => {
       logger.info(`${config.SERVICE_NAME} running on port ${config.PORT}`);
@@ -32,5 +41,4 @@ const startServer = () => {
     logger.error('Failed to start server:', error);
     process.exit(1);
   }
-};
-startServer();
+  })

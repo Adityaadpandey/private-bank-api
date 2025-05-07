@@ -1,0 +1,22 @@
+{
+    "name": "@private-bank/logger",
+    "version": "0.0.1",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "description": "logger private package for private-bank",
+    "private": true,
+    "scripts": {
+        "build": "tsc",
+        "build:pack": "tsc && npm pack"
+    },
+    "dependencies": {
+        "chalk": "^5.4.1",
+        "winston": "^3.17.0"
+    },
+    "license": "MIT",
+    "author": "Aditya",
+    "devDependencies": {
+        "@types/node": "^22.13.13",
+        "typescript": "^5.8.2"
+    }
+}

@@ -1,0 +1,6 @@
+
+export const config = {
+    apiGatewayUrl: process.env.API_GATEWAY_URL || "http://localhost:5000",
+    authServiceUrl: process.env.AUTH_SERVICE_URL || "http://localhost:5001",
+    accountServiceUrl: process.env.ACCOUNT_SERVICE_URL || "http://localhost:5002",
+}
