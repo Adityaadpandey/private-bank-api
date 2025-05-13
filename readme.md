@@ -2,9 +2,9 @@
 
 | Service Name        | Port | Description                    | Done |
 | ------------------- | ---- | ------------------------------ | ---- |
-| API Gateway         | 5000 | Entry point for all requests   | :)   |
-| Auth Service        | 5001 | Authentication & authorization | :)   |
-| Account Service     | 5002 | Account management             | :)   |
+| API Gateway         | 5000 | Entry point for all requests   |  :)  |
+| Auth Service        | 5001 | Authentication & authorization |  :)  |
+| Account Service     | 5002 | Account management             |  :)  |
 | Transaction Service | 5003 | Transaction processing         |      |
 
 ### Supporting Services
