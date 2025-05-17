@@ -1,6 +1,6 @@
 import { config } from '../../config';
 import logger from '../../config/logger';
-import { startTransactionEventsConsumer } from './transactionEvents.producer';
+import { startTransactionEventsConsumer } from './transactionEvents.consumer';
 
 export const startConsumers = async (): Promise<void> => {
     try {

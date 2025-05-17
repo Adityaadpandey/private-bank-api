@@ -1,15 +1,13 @@
+import { ERROR_CODES } from '@private-bank/constants';
 import { Repository } from 'typeorm';
 import logger from '../config/logger';
+import { SAVINGS_ACCOUNT } from '../constants';
 import { AppDataSource } from '../data-source';
-import {
-    Account,
-    AccountType,
-    TransactionType,
-} from '../entity/account.entity';
+import { Account, AccountType } from '../entity/account.entity';
 import { publishAccountCreated } from '../events/producers/accountCreated.producer';
 import { publishAccountDeleted } from '../events/producers/accountDeleted.producer';
+import { TransactionType } from '../types/transaction.types';
 import { createError, generateAccountNumber } from '../utils';
-import { ERROR_CODES, SAVINGS_ACCOUNT } from './../constants';
 
 interface AccountCreateDto {
     userId: number;
@@ -63,6 +61,19 @@ export class AccountService {
         return accounts;
     }
 
+    async findByAccountNumber(accountNumber: string, userId?: number) {
+        const account = await this.accountRepository.findOneBy({
+            accountNumber,
+            ...(userId ? { userId } : {}),
+        });
+
+        if (!account) {
+            throw createError('account not found', 404);
+        }
+
+        return account;
+    }
+
     async delete(userId: number, accountNumber: string) {
         const account = await this.accountRepository.findOneBy({
             userId,
@@ -100,13 +111,13 @@ export class AccountService {
     }
 
     async updateBalance(
-        userId: number,
         accountNumber: string,
         type: TransactionType,
         amount: number,
     ) {
+        amount = Math.abs(amount);
+
         const account = await this.accountRepository.findOneBy({
-            userId,
             accountNumber,
         });
 

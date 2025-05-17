@@ -1,21 +1,22 @@
-import logger from '../../config/logger';
-import { USER_TOPICS } from '../../constant';
+import { USER_TOPICS } from '@private-bank/constants';
+import { BaseProducer, KafkaMessage } from '@private-bank/kafka-client';
 
-import { producer } from '../kafka';
+const { producer } = require('../kafka');
 
-export const publishUserRegisteredEvent = async (data: any) => {
-  const topic = USER_TOPICS.USER_REGISTERED;
-  logger.info(
-    `Publishing event to topic ${topic} with data: ${JSON.stringify(data)}`,
-  );
+export interface UserRegisteredData {
+  id: number;
+}
 
-  await producer.send({
-    topic,
-    messages: [
-      {
-        key: data.key,
-        value: JSON.stringify(data.value),
-      },
-    ],
-  });
-};
+class UserRegisteredProducer extends BaseProducer<UserRegisteredData> {
+  protected readonly topic = USER_TOPICS.USER_REGISTERED;
+
+  constructor() {
+    super(producer);
+  }
+}
+
+const userRegisteredProducer = new UserRegisteredProducer();
+
+export const publishUserRegistered = async (
+  data: KafkaMessage<UserRegisteredData>,
+): Promise<void> => userRegisteredProducer.publish(data);

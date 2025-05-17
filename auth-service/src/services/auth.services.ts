@@ -8,7 +8,7 @@ import redis from '../config/redis';
 import { AppDataSource } from '../data-source';
 import { Credential } from '../entity/credential.entity';
 import { User } from '../entity/user.entity';
-import { publishUserRegisteredEvent } from '../events/producers/userRegistered.producer';
+import { publishUserRegistered } from '../events/producers/userRegistered.producer';
 import { createError } from '../utils';
 
 interface RegisterDto {
@@ -50,7 +50,7 @@ class AuthService {
 
     await this.credentialRepository.save(credential);
 
-    await publishUserRegisteredEvent({
+    await publishUserRegistered({
       key: user.id?.toString(),
       value: user,
     });

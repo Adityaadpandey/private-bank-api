@@ -1,9 +1,9 @@
+import { TRANSACTION_EVENT_TYPES } from '@private-bank/constants';
 import { Repository } from 'typeorm';
 import logger from '../config/logger';
 import { AppDataSource } from '../data-source';
 import {
   Transaction,
-  TRANSACTION_EVENT_TYPES,
   TransactionStatus,
   TransactionType,
 } from '../entity/transaction.entity';

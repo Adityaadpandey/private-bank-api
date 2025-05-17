@@ -33,6 +33,7 @@
         "zod": "^3.24.2",
         "@private-bank/logger": "../packages/logger",
         "@private-bank/redis-client": "../packages/redis-client",
+        "@private-bank/constants": "../packages/constants",
         "@private-bank/kafka-client": "../packages/kafka-client"
     },
     "devDependencies": {

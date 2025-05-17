@@ -6,13 +6,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 
-export enum TransactionType {
-  TRANSFER = 'transfer',
-  CREDIT = 'credit',
-  DEBIT = 'debit',
-}
+import { v4 as uuidv4 } from 'uuid';
 
 export enum TransactionStatus {
   INITIATED = 'initiated',
@@ -20,20 +15,24 @@ export enum TransactionStatus {
   CREDIT_SUCCESS = 'credit_success',
   FAILED = 'failed',
   CREDIT_FAILED = 'credit_failed',
-  DEBIT_FAILED = 'debit_failed',
+  DEBIT_COMPENSATE = 'debit_compensate',
   COMPENSATION_SUCCESS = 'compensation_success',
   COMPLETED = 'completed',
 }
 
-export enum TRANSACTION_EVENT_TYPES {
-  INITIATED = 'transaction_initiated',
-  DEBIT_SUCCESS = 'debit_success',
-  CREDIT_SUCCESS = 'credit_success',
-  FAILED = 'failed',
-  CREDIT_FAILED = 'credit_failed',
-  DEBIT_FAILED = 'debit_failed',
-  COMPENSATION_SUCCESS = 'compensation_success',
-  COMPLETED = 'completed',
+export enum TransactionType {
+  TRANSFER = 'transfer',
+  CREDIT = 'credit',
+  DEBIT = 'debit',
+}
+
+export class DecimalColumnTransformer {
+  to(data: number): number {
+    return data;
+  }
+  from(data: string): number {
+    return parseFloat(data);
+  }
 }
 
 @Entity()
@@ -68,6 +67,15 @@ export class Transaction {
   })
   status: TransactionStatus;
 
+  @Column({
+    name: 'amount',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    transformer: new DecimalColumnTransformer(),
+  })
+  amount: number;
+
   @Column({ name: 'note', nullable: true })
   note: string;
 
@@ -92,9 +100,6 @@ export class Transaction {
   @Column({ name: 'compensated_at', nullable: true })
   compensatedAt: Date;
 
-  @Column({ name: 'amount', type: 'decimal', precision: 10, scale: 2 })
-  amount: number;
-
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
@@ -104,6 +109,6 @@ export class Transaction {
   @BeforeInsert()
   generateTransactionId() {
     const uniquePart = uuidv4().replace(/-/g, '').toUpperCase();
-    this.transactionId = `TXN-${uniquePart}`;
+    this.transactionId = `PRIVAVTE_X-${uniquePart}`;
   }
 }

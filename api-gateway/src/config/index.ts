@@ -10,6 +10,7 @@ interface Config {
   AUTH_SERVICE_URL: string;
   ACCOUNTS_SERVICE_URL: string;
   TRANSACTION_SERVICE_URL: string;
+  NODE_ENV: string;
 }
 
 export const config: Config = {
@@ -26,4 +27,5 @@ export const config: Config = {
     process.env.ACCOUNTS_SERVICE_URL || 'http://localhost:5002',
   TRANSACTION_SERVICE_URL:
     process.env.TRANSACTION_SERVICE_URL || 'http://localhost:5003',
+  NODE_ENV: process.env.NODE_ENV || 'development',
 };
