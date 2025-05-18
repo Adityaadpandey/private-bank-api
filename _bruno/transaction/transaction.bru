@@ -16,13 +16,13 @@ auth:bearer {
 
 body:json {
   {
-    "sourceAccountNumber": "132025130517556",
-    "destinationAccountNumber": "112025119595542",
-    "amount": 100,
+    "sourceAccountNumber": "132025132955157",
+    "destinationAccountNumber": "112025112504925",
+    "amount": 132200,
     "note": "gift"
   }
 }
 
 script:post-response {
-  bru.setEnvVar("latestTransactionId", res.body.transactionId)
+  bru.setEnvVar("latestTransactionId", res.body.data.transactionId)
 }

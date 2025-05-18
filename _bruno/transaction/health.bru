@@ -5,7 +5,11 @@ meta {
 }
 
 get {
-  url: 
+  url: {{api-gateway-base-url}}/api/v1/transactions/health
   body: none
-  auth: inherit
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
 }
