@@ -165,11 +165,11 @@ describe("Complete End-to-End Flow", () => {
             });
 
         expect(response.status).toBe(201);
-        expect(response.body).toHaveProperty("status", "initiated");
-        expect(response.body).toHaveProperty("transactionId");
-        expect(response.body.transactionId).toContain("PRIVAVTE_X-");
+        expect(response.body.data).toHaveProperty("status", "initiated");
+        expect(response.body.data).toHaveProperty("transactionId");
+        expect(response.body.data.transactionId).toContain("PRIVAVTE_X-");
 
-        const transactionId = response.body.transactionId;
+        const transactionId = response.body.data.transactionId;
 
         await new Promise((resolve, reject) => {
             let intervalCounter = 0;
@@ -227,11 +227,11 @@ describe("Complete End-to-End Flow", () => {
             });
 
         expect(response.status).toBe(201);
-        expect(response.body).toHaveProperty("status", "initiated");
-        expect(response.body).toHaveProperty("transactionId");
-        expect(response.body.transactionId).toContain("PRIVAVTE_X-");
+        expect(response.body.data).toHaveProperty("status", "initiated");
+        expect(response.body.data).toHaveProperty("transactionId");
+        expect(response.body.data.transactionId).toContain("PRIVAVTE_X-");
 
-        const transactionId = response.body.transactionId;
+        const transactionId = response.body.data.transactionId;
 
         await new Promise((resolve, reject) => {
             let intervalCounter = 0;
@@ -287,11 +287,11 @@ describe("Complete End-to-End Flow", () => {
             });
 
         expect(response.status).toBe(201);
-        expect(response.body).toHaveProperty("status", "initiated");
-        expect(response.body).toHaveProperty("transactionId");
-        expect(response.body.transactionId).toContain("PRIVAVTE_X-");
+        expect(response.body.data).toHaveProperty("status", "initiated");
+        expect(response.body.data).toHaveProperty("transactionId");
+        expect(response.body.data.transactionId).toContain("PRIVAVTE_X-");
 
-        const transactionId = response.body.transactionId;
+        const transactionId = response.body.data.transactionId;
 
         await new Promise((resolve, reject) => {
             let intervalCounter = 0;
@@ -347,11 +347,11 @@ describe("Complete End-to-End Flow", () => {
             });
 
         expect(response.status).toBe(201);
-        expect(response.body).toHaveProperty("status", "initiated");
-        expect(response.body).toHaveProperty("transactionId");
-        expect(response.body.transactionId).toContain("PRIVAVTE_X-");
+        expect(response.body.data).toHaveProperty("status", "initiated");
+        expect(response.body.data).toHaveProperty("transactionId");
+        expect(response.body.data.transactionId).toContain("PRIVAVTE_X-");
 
-        const transactionId = response.body.transactionId;
+        const transactionId = response.body.data.transactionId;
 
         await new Promise((resolve, reject) => {
             let intervalCounter = 0;
