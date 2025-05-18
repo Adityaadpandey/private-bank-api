@@ -3,16 +3,16 @@ import logger from '../../config/logger';
 import { startTransactionEventsConsumer } from './transactionEvents.producer';
 
 export const startConsumers = async (): Promise<void> => {
-    try {
-        logger.info(`Starting Kafka consumers for ${config.SERVICE_NAME}`);
+  try {
+    logger.info(`Starting Kafka consumers for ${config.SERVICE_NAME}`);
 
-        await startTransactionEventsConsumer();
+    await startTransactionEventsConsumer();
 
-        logger.info(
-            `All Kafka consumers started successfully for ${config.SERVICE_NAME}`,
-        );
-    } catch (error) {
-        logger.error('Failed to start Kafka consumers', error);
-        throw error;
-    }
+    logger.info(
+      `All Kafka consumers started successfully for ${config.SERVICE_NAME}`,
+    );
+  } catch (error) {
+    logger.error('Failed to start Kafka consumers', error);
+    throw error;
+  }
 };

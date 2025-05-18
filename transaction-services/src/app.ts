@@ -24,15 +24,15 @@ app.use('/api/v1/transactions', transactionRouter);
 app.use(errorHandler);
 
 AppDataSource.initialize()
-    .then(async () => {
-        await init();
+  .then(async () => {
+    await init();
 
-        app.listen(config.PORT, () => {
-            logger.info(
-                `${config.SERVICE_NAME} is running on http://localhost:${config.PORT}`,
-            );
-        });
-    })
-    .catch((err) => {
-        console.error('Error during Data Source initialization', err);
+    app.listen(config.PORT, () => {
+      logger.info(
+        `${config.SERVICE_NAME} is running on http://localhost:${config.PORT}`,
+      );
     });
+  })
+  .catch((err) => {
+    console.error('Error during Data Source initialization', err);
+  });

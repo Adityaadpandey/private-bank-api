@@ -10,175 +10,175 @@ import { TransactionType } from '../types/transaction.types';
 import { createError, generateAccountNumber } from '../utils';
 
 interface AccountCreateDto {
-    userId: number;
-    accountType?: AccountType;
-    accountName?: string;
+  userId: number;
+  accountType?: AccountType;
+  accountName?: string;
 }
 
 export class AccountService {
-    accountRepository: Repository<Account>;
+  accountRepository: Repository<Account>;
 
-    constructor() {
-        this.accountRepository = AppDataSource.getRepository(Account);
+  constructor() {
+    this.accountRepository = AppDataSource.getRepository(Account);
+  }
+
+  async create({
+    userId,
+    accountName = SAVINGS_ACCOUNT,
+    accountType = AccountType.SAVINGS,
+  }: AccountCreateDto) {
+    const existing = await this.accountRepository.findOneBy({
+      userId,
+      accountType,
+    });
+
+    if (existing) {
+      throw createError('account already exists', 400);
     }
 
-    async create({
-        userId,
-        accountName = SAVINGS_ACCOUNT,
-        accountType = AccountType.SAVINGS,
-    }: AccountCreateDto) {
-        const existing = await this.accountRepository.findOneBy({
-            userId,
-            accountType,
-        });
+    const account = new Account();
+    account.userId = userId;
+    account.accountNumber = generateAccountNumber(accountType);
+    account.accountType = accountType;
+    account.accountName = accountName;
+    account.balance = 0;
 
-        if (existing) {
-            throw createError('account already exists', 400);
-        }
+    await this.accountRepository.save(account);
 
-        const account = new Account();
-        account.userId = userId;
-        account.accountNumber = generateAccountNumber(accountType);
-        account.accountType = accountType;
-        account.accountName = accountName;
-        account.balance = 0;
+    await publishAccountCreated({
+      key: userId.toString(),
+      value: account,
+    });
 
-        await this.accountRepository.save(account);
+    return account;
+  }
 
-        await publishAccountCreated({
-            key: userId.toString(),
-            value: account,
-        });
+  async list(userId: number) {
+    const accounts = await this.accountRepository.find({
+      where: { userId },
+    });
 
-        return account;
+    return accounts;
+  }
+
+  async findByAccountNumber(accountNumber: string, userId?: number) {
+    const account = await this.accountRepository.findOneBy({
+      accountNumber,
+      ...(userId ? { userId } : {}),
+    });
+
+    if (!account) {
+      throw createError('account not found', 404);
     }
 
-    async list(userId: number) {
-        const accounts = await this.accountRepository.find({
-            where: { userId },
-        });
+    return account;
+  }
 
-        return accounts;
+  async delete(userId: number, accountNumber: string) {
+    const account = await this.accountRepository.findOneBy({
+      userId,
+      accountNumber,
+    });
+
+    if (!account) {
+      throw createError('account not found', 404);
     }
 
-    async findByAccountNumber(accountNumber: string, userId?: number) {
-        const account = await this.accountRepository.findOneBy({
-            accountNumber,
-            ...(userId ? { userId } : {}),
-        });
+    const deleteRes = await this.accountRepository.delete({
+      userId,
+      accountNumber,
+    });
 
-        if (!account) {
-            throw createError('account not found', 404);
-        }
+    if (deleteRes.affected === 0) {
+      throw createError('account not found', 404);
+    } else if (deleteRes.affected === 1) {
+      logger.info(
+        `account ${accountNumber} deleted for user ${userId}`,
+        deleteRes,
+      );
 
-        return account;
+      await publishAccountDeleted({
+        key: userId.toString(),
+        value: account,
+      });
+    } else {
+      logger.error(
+        `account ${accountNumber} deletion failed for user ${userId}`,
+        deleteRes,
+      );
+      throw createError('account deletion failed', 500);
+    }
+  }
+
+  async updateBalance(
+    accountNumber: string,
+    type: TransactionType,
+    amount: number,
+  ) {
+    amount = Math.abs(amount);
+
+    const account = await this.accountRepository.findOneBy({
+      accountNumber,
+    });
+
+    if (!account) {
+      throw createError('account not found', 404);
     }
 
-    async delete(userId: number, accountNumber: string) {
-        const account = await this.accountRepository.findOneBy({
-            userId,
-            accountNumber,
-        });
+    if (type === TransactionType.CREDIT) {
+      account.balance += amount;
+    } else if (type === TransactionType.DEBIT) {
+      if (account.balance < amount) {
+        throw createError('insufficient balance', 400);
+      }
 
-        if (!account) {
-            throw createError('account not found', 404);
-        }
-
-        const deleteRes = await this.accountRepository.delete({
-            userId,
-            accountNumber,
-        });
-
-        if (deleteRes.affected === 0) {
-            throw createError('account not found', 404);
-        } else if (deleteRes.affected === 1) {
-            logger.info(
-                `account ${accountNumber} deleted for user ${userId}`,
-                deleteRes,
-            );
-
-            await publishAccountDeleted({
-                key: userId.toString(),
-                value: account,
-            });
-        } else {
-            logger.error(
-                `account ${accountNumber} deletion failed for user ${userId}`,
-                deleteRes,
-            );
-            throw createError('account deletion failed', 500);
-        }
+      account.balance -= amount;
     }
 
-    async updateBalance(
-        accountNumber: string,
-        type: TransactionType,
-        amount: number,
-    ) {
-        amount = Math.abs(amount);
+    account.balance = Number(account.balance.toFixed(2));
+    await this.accountRepository.save(account);
 
-        const account = await this.accountRepository.findOneBy({
-            accountNumber,
-        });
+    return account;
+  }
 
-        if (!account) {
-            throw createError('account not found', 404);
-        }
+  async updateBalanceByAccountNumber(
+    accountNumber: string,
+    type: TransactionType,
+    amount: number,
+  ) {
+    amount = Math.abs(amount);
 
-        if (type === TransactionType.CREDIT) {
-            account.balance += amount;
-        } else if (type === TransactionType.DEBIT) {
-            if (account.balance < amount) {
-                throw createError('insufficient balance', 400);
-            }
+    const account = await this.accountRepository.findOneBy({
+      accountNumber,
+    });
 
-            account.balance -= amount;
-        }
-
-        account.balance = Number(account.balance.toFixed(2));
-        await this.accountRepository.save(account);
-
-        return account;
+    if (!account) {
+      throw createError(
+        'account not found',
+        404,
+        ERROR_CODES.ACCOUNT_NOT_FOUND,
+      );
     }
 
-    async updateBalanceByAccountNumber(
-        accountNumber: string,
-        type: TransactionType,
-        amount: number,
-    ) {
-        amount = Math.abs(amount);
+    if (type === TransactionType.CREDIT) {
+      account.balance += amount;
+    } else if (type === TransactionType.DEBIT) {
+      if (account.balance < amount) {
+        throw createError(
+          'insufficient balance',
+          400,
+          ERROR_CODES.INSUFFICIENT_BALANCE,
+        );
+      }
 
-        const account = await this.accountRepository.findOneBy({
-            accountNumber,
-        });
-
-        if (!account) {
-            throw createError(
-                'account not found',
-                404,
-                ERROR_CODES.ACCOUNT_NOT_FOUND,
-            );
-        }
-
-        if (type === TransactionType.CREDIT) {
-            account.balance += amount;
-        } else if (type === TransactionType.DEBIT) {
-            if (account.balance < amount) {
-                throw createError(
-                    'insufficient balance',
-                    400,
-                    ERROR_CODES.INSUFFICIENT_BALANCE,
-                );
-            }
-
-            account.balance -= amount;
-        }
-
-        account.balance = Number(account.balance.toFixed(2));
-        await this.accountRepository.save(account);
-
-        return account;
+      account.balance -= amount;
     }
+
+    account.balance = Number(account.balance.toFixed(2));
+    await this.accountRepository.save(account);
+
+    return account;
+  }
 }
 
 export const accountService = new AccountService();
