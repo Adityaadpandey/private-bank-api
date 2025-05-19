@@ -8,11 +8,13 @@ import helmet from 'helmet';
 import { config } from './config';
 import logger from './config/logger';
 import { proxyServices } from './config/services';
+// import { apiKeyMiddleware } from './middlewares/api-key.middleware';
 import { limiter } from './middlewares/rate-limit.middleware';
 
 const app = express();
 
 app.use(helmet());
+// app.use(apiKeyMiddleware);
 app.use(cors());
 app.use(limiter);
 

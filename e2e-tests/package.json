@@ -1,7 +1,7 @@
 {
     "name": "e2e-tests",
     "version": "1.0.0",
-    "description": "End-to-end tests for vbank microservices",
+    "description": "End-to-end tests for private bazk microservices",
     "main": "index.js",
     "scripts": {
         "test": "jest",
@@ -21,6 +21,6 @@
         "ts-jest": "^29.3.2",
         "typescript": "^5.8.3"
     },
-    "author": "vivekbharatha",
+    "author": "aditya",
     "license": "MIT"
 }
